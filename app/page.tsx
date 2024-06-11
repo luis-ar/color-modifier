@@ -5,14 +5,16 @@ export default function Home() {
   const svgUrl =
     "https://ik.imagekit.io/m5f5k3axy/svg-2.svg?updatedAt=1718080233270";
 
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>(svgUrl);
   const [colors, setColors] = useState<{ id: string; color: string }[]>([]);
   const [svgContent, setSvgContent] = useState<string>("");
   const [search, setSearch] = useState<boolean>(false);
   useEffect(() => {
     const fetchSVG = async () => {
-      if (search) {
+      if (search || imageUrl !== "") {
         try {
+          setImageUrl("");
+
           const response = await fetch(imageUrl);
           let svgText = await response.text();
           svgText = addDimensionsToSVG(svgText);
@@ -20,8 +22,6 @@ export default function Home() {
           setSvgContent(svgText);
           extractColorsFromSVG(svgText);
           setSearch(false);
-
-          setImageUrl("");
         } catch (error) {
           console.error("Error fetching SVG:", error);
         }
