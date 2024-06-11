@@ -4,20 +4,27 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const svgUrl =
     "https://ik.imagekit.io/m5f5k3axy/svg-2.svg?updatedAt=1718080233270";
+
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [colors, setColors] = useState<{ id: string; color: string }[]>([]);
   const [svgContent, setSvgContent] = useState<string>("");
-
+  const [search, setSearch] = useState<boolean>(false);
   useEffect(() => {
     const fetchSVG = async () => {
-      try {
-        const response = await fetch(svgUrl);
-        let svgText = await response.text();
-        svgText = addDimensionsToSVG(svgText);
+      if (search) {
+        try {
+          const response = await fetch(imageUrl);
+          let svgText = await response.text();
+          svgText = addDimensionsToSVG(svgText);
 
-        setSvgContent(svgText);
-        extractColorsFromSVG(svgText);
-      } catch (error) {
-        console.error("Error fetching SVG:", error);
+          setSvgContent(svgText);
+          extractColorsFromSVG(svgText);
+          setSearch(false);
+
+          setImageUrl("");
+        } catch (error) {
+          console.error("Error fetching SVG:", error);
+        }
       }
     };
     const addDimensionsToSVG = (svgText: string): string => {
@@ -67,7 +74,7 @@ export default function Home() {
     };
 
     fetchSVG();
-  }, [svgUrl]);
+  }, [search]);
 
   const handleColorChange = (e: any, id: string) => {
     const newColor = e.target.value;
@@ -90,9 +97,33 @@ export default function Home() {
 
     setSvgContent(svgDoc.documentElement.outerHTML);
   };
+
+  const handleImageChange = (e: any) => {
+    e.preventDefault();
+    const newImageUrl = e.target.value;
+    setImageUrl(newImageUrl);
+  };
+  const hadlesubmit = (e: any) => {
+    e.preventDefault();
+    setSearch(true);
+  };
   return (
     <>
       <div>
+        <form onSubmit={hadlesubmit}>
+          <h2>URL IMAGE</h2>
+          <input
+            type="text"
+            value={imageUrl}
+            onChange={(e) => handleImageChange(e)}
+          />
+          <input
+            type="submit"
+            value={"Search Image"}
+            className="cursor-pointer pl-3"
+          />
+        </form>
+
         <h2>Color Palette</h2>
         <div>
           {colors.length > 0 ? (
